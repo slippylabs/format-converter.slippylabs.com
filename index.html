@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Format Converter // format-converter.slippylabs.com</title>
+<meta name="description" content="Convert between JSON, YAML, TOML, CSV and XML in any direction, with an explicit warning about anything the conversion cannot carry across. Runs entirely in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://format-converter.slippylabs.com/">
+<meta property="og:title" content="Data Format Converter // format-converter.slippylabs.com">
+<meta property="og:description" content="Convert between JSON, YAML, TOML, CSV and XML in any direction, with an explicit warning about anything the conversion cannot carry across. Runs entirely in your browser.">
+<meta property="og:image" content="https://format-converter.slippylabs.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Data Format Converter // format-converter.slippylabs.com">
+<meta name="twitter:description" content="Convert between JSON, YAML, TOML, CSV and XML in any direction, with an explicit warning about anything the conversion cannot carry across. Runs entirely in your browser.">
+<meta name="twitter:image" content="https://format-converter.slippylabs.com/og-image.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2234%22%20r%3D%2222%22%20fill%3D%22%231c8a52%22%20stroke%3D%22%2339ff8f%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22%231c8a52%22%20stroke%3D%22%2339ff8f%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2244%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22%231c8a52%22%20stroke%3D%22%2339ff8f%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E">
+<meta name="theme-color" content="#050b10">
+<link rel="stylesheet" href="style.css?v=1">
+<script>/* perf-lite: drop blend/blur effects on low-power devices. ?fx=lite or ?fx=full to override (persisted). */
+(function(){try{var k="slippy-fx",m=location.search.match(/[?&]fx=(lite|full)/),v=m?m[1]:localStorage.getItem(k);if(m)localStorage.setItem(k,v);if(v==="lite"||(v!=="full"&&(navigator.hardwareConcurrency||8)<=2))document.documentElement.classList.add("perf-lite");}catch(e){}})();</script>
+</head>
+<body>
+
+<div class="starfield"></div>
+<div class="scanlines"></div>
+
+<main class="page-wrap">
+  <div class="hud-panel wide">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+    <div class="callsign-row">
+      <div class="toad-avatar-wrap">
+        <svg class="toad-avatar" width="46" height="46" viewBox="0 0 64 64">
+          <circle cx="32" cy="34" r="22" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="20" cy="16" r="8" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="44" cy="16" r="8" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="20" cy="16" r="3.5" fill="#050b10"/>
+          <circle cx="44" cy="16" r="3.5" fill="#050b10"/>
+          <ellipse cx="24" cy="32" rx="4.5" ry="5.5" fill="#050b10"/>
+          <ellipse cx="40" cy="32" rx="4.5" ry="5.5" fill="#050b10"/>
+          <circle cx="24" cy="30" r="1.4" fill="#39ff8f"/>
+          <circle cx="40" cy="30" r="1.4" fill="#39ff8f"/>
+          <path d="M22 42 Q32 48 42 42" stroke="#050b10" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="lock-reticle"></div>
+      </div>
+      <span class="callsign">Workshop Division // Tool</span>
+      <div class="nav-links">
+        <a href="https://projects.slippylabs.com/" class="logout-link">← Archive</a>
+      </div>
+    </div>
+
+    <h1>DATA FORMAT CONVERTER</h1>
+    <p class="subtitle">Paste in any of the five formats and read it back out as any other. The format of what you paste is detected automatically, and anything a conversion has to drop is listed rather than silently lost.</p>
+
+    <div class="two-col conv-cols">
+      <div>
+        <div class="conv-head">
+          <label class="tool-field-label" for="input-text">Input</label>
+          <select class="tool-select conv-select" id="input-format">
+            <option value="auto">Detect automatically</option>
+            <option value="json">JSON</option>
+            <option value="yaml">YAML</option>
+            <option value="toml">TOML</option>
+            <option value="csv">CSV</option>
+            <option value="xml">XML</option>
+          </select>
+        </div>
+        <textarea class="tool-textarea conv-area" id="input-text" rows="18" spellcheck="false"
+                  autocapitalize="off" autocomplete="off"></textarea>
+      </div>
+      <div>
+        <div class="conv-head">
+          <label class="tool-field-label" for="output-text">Output</label>
+          <select class="tool-select conv-select" id="output-format">
+            <option value="json">JSON</option>
+            <option value="yaml" selected>YAML</option>
+            <option value="toml">TOML</option>
+            <option value="csv">CSV</option>
+            <option value="xml">XML</option>
+          </select>
+        </div>
+        <textarea class="tool-textarea conv-area" id="output-text" rows="18" spellcheck="false"
+                  readonly></textarea>
+      </div>
+    </div>
+
+    <div class="tool-controls">
+      <button class="tool-btn" id="copy-btn">Copy Output</button>
+      <button class="tool-btn" id="download-btn">Download</button>
+      <button class="tool-btn ghost" id="swap-btn">⇄ Send Output to Input</button>
+      <button class="tool-btn ghost" id="sample-btn">Load Sample</button>
+      <button class="tool-btn ghost" id="clear-btn">Clear</button>
+    </div>
+
+    <div class="tool-checks">
+      <label class="tool-check"><input type="checkbox" id="opt-indent4"> 4-space indent</label>
+      <label class="tool-check"><input type="checkbox" id="opt-sort"> Sort keys</label>
+    </div>
+
+    <p class="tool-note" id="convert-error" role="alert"></p>
+    <p class="tool-note" id="detect-note"></p>
+    <div class="lossy-box" id="lossy-box">
+      <div class="lossy-label">What this conversion cannot carry across</div>
+      <ul class="lossy-list" id="lossy-list"></ul>
+    </div>
+
+    <p class="tool-note">
+      Each parser covers the part of its format that configuration files actually use.
+      YAML: block and flow collections, all five scalar styles, comments, multi-document input
+      (first document only) — but not anchors, aliases or custom tags.
+      TOML: tables, arrays of tables, inline tables, all string forms and dotted keys — dates are
+      read as text.
+      CSV: RFC 4180 quoting, with the first row as the header.
+      XML: elements, attributes and text; comments, namespaces prefixes and processing
+      instructions are dropped.
+    </p>
+
+    <div class="comm-window">
+      <div class="comm-portrait">
+        <svg width="36" height="36" viewBox="0 0 64 64">
+          <circle cx="32" cy="34" r="22" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="20" cy="16" r="8" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="44" cy="16" r="8" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="20" cy="16" r="3.5" fill="#050b10"/>
+          <circle cx="44" cy="16" r="3.5" fill="#050b10"/>
+          <ellipse cx="24" cy="32" rx="4.5" ry="5.5" fill="#050b10"/>
+          <ellipse cx="40" cy="32" rx="4.5" ry="5.5" fill="#050b10"/>
+          <circle cx="24" cy="30" r="1.4" fill="#39ff8f"/>
+          <circle cx="40" cy="30" r="1.4" fill="#39ff8f"/>
+          <path d="M22 42 Q32 48 42 42" stroke="#050b10" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="comm-body">
+        <div class="comm-label"><span class="dot"></span> Incoming Transmission &mdash; Slippy</div>
+        <p>&quot;Half of config debugging is just reading the same data in a different shape.&quot;</p>
+      </div>
+    </div>
+
+    <a href="https://projects.slippylabs.com/" class="hud-btn">← Back to Archive</a>
+  </div>
+</main>
+
+<script>
+/* ---- format core -----------------------------------------------------------
+   One internal model — the JSON data model — with a parser and an emitter per
+   format. Everything above the UI marker is pure; verify_formats.py drives it
+   both ways against PyYAML, tomllib/tomli-w, csv and ElementTree.
+
+   The rule the SQL formatter taught: never tidy an emitter's output with a
+   regex afterwards. Quoting is decided per value, at the point the value is
+   written, where the type is still known. */
+
+/* ============================ shared helpers ============================= */
+
+function typeOf(value) {
+  if (value === null) return 'null';
+  if (Array.isArray(value)) return 'array';
+  return typeof value;                    // object | string | number | boolean
+}
+
+function isPlainObject(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function sortDeep(value) {
+  if (Array.isArray(value)) return value.map(sortDeep);
+  if (isPlainObject(value)) {
+    const out = {};
+    for (const key of Object.keys(value).sort()) out[key] = sortDeep(value[key]);
+    return out;
+  }
+  return value;
+}
+
+/* ================================= JSON ================================== */
+
+function parseJSON(text) { return JSON.parse(text); }
+
+function emitJSON(value, options) {
+  return JSON.stringify(value, null, options.indent) + '\n';
+}
+
+/* ================================= YAML ================================== */
+
+/* Anything YAML 1.1 would resolve as a non-string has to be quoted when it is
+   actually a string, or "no" comes back as false and "12:30" as 750. */
+const YAML_RESERVED = new Set([
+  'y', 'yes', 'n', 'no', 'true', 'false', 'on', 'off', 'null', '~',
+  '.inf', '-.inf', '+.inf', '.nan',
+]);
+
+function yamlNeedsQuote(str) {
+  if (str === '') return true;
+  if (YAML_RESERVED.has(str.toLowerCase())) return true;
+  if (/^[-+]?(\d[\d_]*|0x[0-9a-fA-F_]+|0o?[0-7_]+|0b[01_]+)$/.test(str)) return true;
+  if (/^[-+]?(\d[\d_]*)?\.[\d_]*([eE][-+]?\d+)?$/.test(str)) return true;
+  if (/^[-+]?\d[\d_]*(:[0-5]?\d)+(\.[\d_]*)?$/.test(str)) return true;   // sexagesimal
+  if (/^\d{4}-\d{1,2}-\d{1,2}([Tt ].*)?$/.test(str)) return true;        // timestamp
+  if (/^[&*!|>%@`"'#]/.test(str)) return true;                           // indicator start
+  if (/^[-?:]( |$)/.test(str)) return true;
+  if (/: |:$| #/.test(str)) return true;
+  if (/^\s|\s$/.test(str)) return true;
+  if (/[\n\r\t\x00-\x1f\x7f]/.test(str)) return true;
+  if (/[,[\]{}]/.test(str)) return true;
+  return false;
+}
+
+function yamlQuote(str) {
+  const escaped = str
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g,
+             (c) => '\\x' + c.charCodeAt(0).toString(16).padStart(2, '0'));
+  return '"' + escaped + '"';
+}
+
+/* YAML 1.1 will only read an exponent that has an explicit sign and a decimal
+   point in front of it, so "1e+21" round-trips as a *string* unless it is
+   written out properly. */
+function yamlNumber(num) {
+  if (!Number.isFinite(num)) return num > 0 ? '.inf' : (num < 0 ? '-.inf' : '.nan');
+  const text = String(num);
+  if (text.indexOf('e') === -1 && text.indexOf('E') === -1) return text;
+  if (Number.isInteger(num) && Math.abs(num) < 1e30) return BigInt(num).toString();
+  const [mantissa, exponent] = text.split('e');
+  const withDot = mantissa.indexOf('.') === -1 ? mantissa + '.0' : mantissa;
+  const sign = exponent[0] === '-' || exponent[0] === '+' ? '' : '+';
+  return withDot + 'e' + sign + exponent;
+}
+
+function yamlScalar(value) {
+  const kind = typeOf(value);
+  if (kind === 'null') return 'null';
+  if (kind === 'boolean') return value ? 'true' : 'false';
+  if (kind === 'number') return yamlNumber(value);
+  return yamlNeedsQuote(value) ? yamlQuote(value) : value;
+}
+
+function emitYAML(value, options) {
+  const pad = ' '.repeat(options.indent);
+
+  const write = (node, depth, lines) => {
+    const prefix = pad.repeat(depth);
+    if (Array.isArray(node)) {
+      if (!node.length) return;
+      for (const item of node) {
+        if (isPlainObject(item) && Object.keys(item).length) {
+          const inner = [];
+          write(item, depth + 1, inner);
+          // The first line of the child rides on the dash.
+          lines.push(prefix + '- ' + inner[0].slice((depth + 1) * options.indent));
+          for (let i = 1; i < inner.length; i++) lines.push(inner[i]);
+        } else if (Array.isArray(item) && item.length) {
+          // A sequence inside a sequence goes on its own lines; "- - x" is
+          // legal YAML but needs a parser that can re-enter mid-line.
+          lines.push(prefix + '-');
+          write(item, depth + 1, lines);
+        } else if (Array.isArray(item)) {
+          lines.push(prefix + '- []');
+        } else if (isPlainObject(item)) {
+          lines.push(prefix + '- {}');
+        } else {
+          lines.push(prefix + '- ' + yamlScalar(item));
+        }
+      }
+      return;
+    }
+    if (isPlainObject(node)) {
+      for (const key of Object.keys(node)) {
+        const child = node[key];
+        const keyText = yamlNeedsQuote(key) ? yamlQuote(key) : key;
+        if (isPlainObject(child) && Object.keys(child).length) {
+          lines.push(prefix + keyText + ':');
+          write(child, depth + 1, lines);
+        } else if (Array.isArray(child) && child.length) {
+          lines.push(prefix + keyText + ':');
+          write(child, depth + 1, lines);
+        } else if (Array.isArray(child)) {
+          lines.push(prefix + keyText + ': []');
+        } else if (isPlainObject(child)) {
+          lines.push(prefix + keyText + ': {}');
+        } else {
+          lines.push(prefix + keyText + ': ' + yamlScalar(child));
+        }
+      }
+      return;
+    }
+    lines.push(prefix + yamlScalar(node));
+  };
+
+  const lines = [];
+  write(value, 0, lines);
+  return lines.length ? lines.join('\n') + '\n' : (Array.isArray(value) ? '[]\n' : '{}\n');
+}
+
+/* --- YAML parsing. Indentation-driven, one line at a time. --------------- */
+
+function yamlUnescape(str) {
+  return str.replace(/\\(x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|.)/g, (match, code) => {
+    if (code[0] === 'x' || code[0] === 'u') return String.fromCharCode(parseInt(code.slice(1), 16));
+    switch (code) {
+      case 'n': return '\n';
+      case 't': return '\t';
+      case 'r': return '\r';
+      case '0': return '\0';
+      case 'b': return '\b';
+      case 'f': return '\f';
+      case '/': return '/';
+      case '\\': return '\\';
+      case '"': return '"';
+      default: return code;
+    }
+  });
+}
+
+function yamlPlainScalar(text) {
+  const trimmed = text.trim();
+  if (trimmed === '' || trimmed === '~' || /^null$/i.test(trimmed)) return null;
+  if (/^(true|yes|on)$/i.test(trimmed)) return true;
+  if (/^(false|no|off)$/i.test(trimmed)) return false;
+  if (/^[-+]?\d+$/.test(trimmed)) return Number(trimmed);
+  if (/^[-+]?0x[0-9a-fA-F]+$/.test(trimmed)) return parseInt(trimmed, 16);
+  if (/^[-+]?(\d+\.\d*|\.\d+)([eE][-+]?\d+)?$/.test(trimmed)) return Number(trimmed);
+  if (/^[-+]?\d+[eE][-+]\d+$/.test(trimmed)) return Number(trimmed);
+  if (/^[-+]?\.inf$/i.test(trimmed)) return trimmed[0] === '-' ? -Infinity : Infinity;
+  if (/^\.nan$/i.test(trimmed)) return NaN;
+  return trimmed;
+}
+
+/* Splits a flow collection body on top-level commas only. */
+function splitFlow(body) {
+  const parts = [];
+  let depth = 0, quote = null, current = '';
+  for (let i = 0; i < body.length; i++) {
+    const ch = body[i];
+    if (quote) {
+      current += ch;
+      if (ch === '\\' && quote === '"') { current += body[++i] || ''; continue; }
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'") { quote = ch; current += ch; continue; }
+    if (ch === '[' || ch === '{') depth++;
+    if (ch === ']' || ch === '}') depth--;
+    if (ch === ',' && depth === 0) { parts.push(current); current = ''; continue; }
+    current += ch;
+  }
+  if (current.trim() !== '') parts.push(current);
+  return parts;
+}
+
+function yamlValue(text) {
+  const trimmed = text.trim();
+  if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length > 1) {
+    return yamlUnescape(trimmed.slice(1, -1));
+  }
+  if (trimmed.startsWith("'") && trimmed.endsWith("'") && trimmed.length > 1) {
+    return trimmed.slice(1, -1).replace(/''/g, "'");
+  }
+  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+    const body = trimmed.slice(1, -1).trim();
+    return body === '' ? [] : splitFlow(body).map(yamlValue);
+  }
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    const body = trimmed.slice(1, -1).trim();
+    const out = {};
+    if (body === '') return out;
+    for (const part of splitFlow(body)) {
+      const pair = splitKeyValue(part.trim());
+      if (!pair) { out[yamlKey(part)] = null; continue; }
+      out[yamlKey(pair[0])] = pair[1] === null ? null : yamlValue(pair[1]);
+    }
+    return out;
+  }
+  return yamlPlainScalar(stripComment(trimmed));
+}
+
+function yamlKey(text) {
+  const trimmed = text.trim();
+  if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length > 1) {
+    return yamlUnescape(trimmed.slice(1, -1));
+  }
+  if (trimmed.startsWith("'") && trimmed.endsWith("'") && trimmed.length > 1) {
+    return trimmed.slice(1, -1).replace(/''/g, "'");
+  }
+  return trimmed;
+}
+
+/* True when a quote at this position actually opens a quoted scalar. A quote
+   in the middle of a plain scalar (with"quote) is just a character, and
+   treating it as an opener makes the scanner run off the end of the line. */
+function opensQuote(text, index) {
+  for (let i = index - 1; i >= 0; i--) {
+    const ch = text[i];
+    if (ch === ' ' || ch === '\t') continue;
+    return ch === '[' || ch === '{' || ch === ',' || ch === ':' || ch === '-';
+  }
+  return true;
+}
+
+/* Finds the ": " that separates a key from its value, skipping quoted spans
+   and flow collections so "a: {b: 1}" and '"x: y": 1' both split correctly.
+   Returns null when the line holds no key at all — a bare scalar document. */
+function splitKeyValue(line) {
+  let quote = null, depth = 0;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (quote) {
+      if (ch === '\\' && quote === '"') { i++; continue; }
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if ((ch === '"' || ch === "'") && opensQuote(line, i)) { quote = ch; continue; }
+    if (ch === '[' || ch === '{') { depth++; continue; }
+    if (ch === ']' || ch === '}') { depth--; continue; }
+    if (ch === ':' && depth === 0 && (i + 1 === line.length || /[\s]/.test(line[i + 1]))) {
+      const value = line.slice(i + 1).trim();
+      return [line.slice(0, i), value === '' ? null : value];
+    }
+  }
+  return null;
+}
+
+function stripComment(text) {
+  let quote = null;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (quote) {
+      if (ch === '\\' && quote === '"') { i++; continue; }
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if ((ch === '"' || ch === "'") && opensQuote(text, i)) { quote = ch; continue; }
+    if (ch === '#' && (i === 0 || /\s/.test(text[i - 1]))) return text.slice(0, i).trimEnd();
+  }
+  return text;
+}
+
+function parseYAML(text) {
+  // Only the first document; "---" separators end the parse.
+  const rawLines = text.replace(/\r\n?/g, '\n').split('\n');
+  const lines = [];
+  for (const raw of rawLines) {
+    if (/^\.\.\.\s*$/.test(raw)) break;
+    if (/^---\s*$/.test(raw)) {
+      if (lines.length) break;
+      continue;
+    }
+    lines.push(raw);
+  }
+
+  const entries = [];
+  let blanks = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^\s*$/.test(line)) { blanks++; continue; }
+    if (/^\s*#/.test(line)) continue;
+    const indent = line.length - line.trimStart().length;
+    entries.push({ indent, text: line.trimStart(), line: i + 1, raw: line, blanks });
+    blanks = 0;
+  }
+  if (!entries.length) return null;
+
+  let pos = 0;
+
+  /* True once a quoted scalar has found its closing quote on this line. */
+  const quoteClosed = (text) => {
+    const q = text[0];
+    if (q !== '"' && q !== "'") return true;
+    let i = 1;
+    while (i < text.length) {
+      if (q === '"' && text[i] === '\\') { i += 2; continue; }
+      if (text[i] === q) {
+        if (q === "'" && text[i + 1] === "'") { i += 2; continue; }
+        return true;
+      }
+      i++;
+    }
+    return false;
+  };
+
+  /* A quoted scalar may run over several lines. Folding rules: one line break
+     becomes a space, n blank lines become n line breaks. */
+  const joinFolded = (value) => {
+    if (quoteClosed(value)) return value;
+    let out = value;
+    while (pos < entries.length && !quoteClosed(out)) {
+      const entry = entries[pos];
+      pos++;
+      out += entry.blanks > 0 ? '\n'.repeat(entry.blanks) : ' ';
+      out += entry.text;
+    }
+    return out;
+  };
+
+  /* A block scalar's body is every following line indented past its header. */
+  const readBlockScalar = (header, parentIndent) => {
+    const fold = header[0] === '>';
+    const chomp = header.indexOf('-') !== -1 ? 'strip'
+                : header.indexOf('+') !== -1 ? 'keep' : 'clip';
+    const bodyLines = [];
+    let bodyIndent = null;
+    while (pos < entries.length && entries[pos].indent > parentIndent) {
+      const entry = entries[pos];
+      if (bodyIndent === null) bodyIndent = entry.indent;
+      bodyLines.push(entry.raw.slice(bodyIndent));
+      pos++;
+    }
+    let body = bodyLines.join('\n');
+    if (fold) {
+      // A folded scalar joins lines with a space, but a blank line stays a break.
+      body = body.replace(/\n(?!\n)(?=\S)/g, ' ').replace(/\n\n/g, '\n');
+    }
+    if (chomp === 'strip') body = body.replace(/\n+$/, '');
+    else if (chomp === 'clip') body = body.replace(/\n+$/, '') + '\n';
+    else body += '\n';
+    return body;
+  };
+
+  /* The value of "key:" is either indented past the key, or is a sequence
+     written flush with it. Anything else means the key has no value. */
+  const childBlock = (indent) => {
+    if (pos >= entries.length) return null;
+    if (entries[pos].indent > indent) return parseBlock(entries[pos].indent);
+    if (entries[pos].indent === indent &&
+        (entries[pos].text.startsWith('- ') || entries[pos].text === '-')) {
+      return parseBlock(indent);
+    }
+    return null;
+  };
+
+  const parseBlock = (indent) => {
+    if (pos >= entries.length) return null;
+    // A lone line with no "key:" in it is a scalar document, not a mapping.
+    if (!entries[pos].text.startsWith('- ') && entries[pos].text !== '-' &&
+        splitKeyValue(entries[pos].text) === null) {
+      const value = yamlValue(entries[pos].text);
+      pos++;
+      return value;
+    }
+    if (entries[pos].text.startsWith('- ') || entries[pos].text === '-') {
+      const list = [];
+      while (pos < entries.length && entries[pos].indent === indent &&
+             (entries[pos].text.startsWith('- ') || entries[pos].text === '-')) {
+        const entry = entries[pos];
+        const rest = entry.text === '-' ? '' : entry.text.slice(2).trim();
+        // "- - x" is a sequence opening on another sequence's dash. Rewrite the
+        // line as if it began two columns further in and re-enter, which also
+        // covers "- - - x" without a special case.
+        if (/^-( |$)/.test(rest)) {
+          entries[pos] = { indent: indent + 2, text: rest, line: entry.line,
+                           raw: entry.raw.slice(2) };
+          list.push(parseBlock(indent + 2));
+          continue;
+        }
+        pos++;
+        if (rest === '') {
+          list.push(childBlock(indent));
+          continue;
+        }
+        if (/^[|>][-+]?\d*$/.test(rest)) { list.push(readBlockScalar(rest, indent)); continue; }
+        const pair = splitKeyValue(rest);
+        if (pair) {
+          const key = pair[0];
+          const value = pair[1];
+          // "- key: value" opens a map whose members are indented to the text
+          // after the dash, not to the dash itself.
+          const itemIndent = indent + (entry.text.length - entry.text.slice(2).length);
+          const map = {};
+          map[yamlKey(key)] = value === null ? childBlock(itemIndent)
+                                             : yamlValue(joinFolded(value));
+          while (pos < entries.length && entries[pos].indent === itemIndent &&
+                 !entries[pos].text.startsWith('- ') && splitKeyValue(entries[pos].text)) {
+            const [k2, v2] = splitKeyValue(entries[pos].text);
+            pos++;
+            if (v2 === null) {
+              map[yamlKey(k2)] = childBlock(itemIndent);
+            } else if (/^[|>][-+]?\d*$/.test(v2)) {
+              map[yamlKey(k2)] = readBlockScalar(v2, itemIndent);
+            } else {
+              map[yamlKey(k2)] = yamlValue(joinFolded(v2));
+            }
+          }
+          list.push(map);
+          continue;
+        }
+        list.push(yamlValue(joinFolded(rest)));
+      }
+      return list;
+    }
+
+    const map = {};
+    while (pos < entries.length && entries[pos].indent === indent &&
+           !entries[pos].text.startsWith('- ') &&
+           (splitKeyValue(entries[pos].text) || /^\?( |$)/.test(entries[pos].text))) {
+      const entry = entries[pos];
+      if (/^\?( |$)/.test(entry.text)) {
+        // Explicit key: "? <key>" on one line, "the value" on the next.
+        const keyText = entry.text.slice(1).trim();
+        pos++;
+        const explicitKey = yamlKey(joinFolded(keyText));
+        if (pos < entries.length && entries[pos].indent === indent &&
+            /^:( |$)/.test(entries[pos].text)) {
+          const valueText = entries[pos].text.slice(1).trim();
+          pos++;
+          map[explicitKey] = valueText === '' ? childBlock(indent)
+                                              : yamlValue(joinFolded(valueText));
+        } else {
+          map[explicitKey] = null;
+        }
+        continue;
+      }
+      const [key, value] = splitKeyValue(entry.text);
+      pos++;
+      if (value === null) {
+        map[yamlKey(key)] = childBlock(indent);
+      } else if (/^[|>][-+]?\d*$/.test(value)) {
+        map[yamlKey(key)] = readBlockScalar(value, indent);
+      } else {
+        map[yamlKey(key)] = yamlValue(joinFolded(value));
+      }
+    }
+    return map;
+  };
+
+  const result = parseBlock(entries[0].indent);
+  if (pos < entries.length) {
+    throw new Error('Line ' + entries[pos].line + ': unexpected indentation — "' +
+                    entries[pos].text.slice(0, 40) + '"');
+  }
+  return result;
+}
+
+/* ================================= TOML ================================== */
+
+function tomlKeyText(key) {
+  return /^[A-Za-z0-9_-]+$/.test(key) && key !== '' ? key : tomlString(key);
+}
+
+function tomlString(str) {
+  const escaped = str
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g,
+             (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+  return '"' + escaped + '"';
+}
+
+/* TOML integers are signed 64-bit; anything outside that has to go out as a
+   float or the reference parsers reject it. */
+function tomlNumber(num) {
+  if (!Number.isFinite(num)) return num > 0 ? 'inf' : (num < 0 ? '-inf' : 'nan');
+  if (Number.isInteger(num) && Math.abs(num) <= 9223372036854775000) {
+    const text = String(num);
+    return text.indexOf('e') === -1 ? text : BigInt(num).toString();
+  }
+  const text = String(num);
+  if (text.indexOf('e') !== -1 || text.indexOf('.') !== -1) return text;
+  return text + '.0';
+}
+
+function tomlScalar(value) {
+  const kind = typeOf(value);
+  if (kind === 'boolean') return value ? 'true' : 'false';
+  if (kind === 'number') return tomlNumber(value);
+  if (kind === 'string') return tomlString(value);
+  if (kind === 'array') return '[' + value.map(tomlInline).join(', ') + ']';
+  if (kind === 'object') return tomlInline(value);
+  return '""';                            // TOML has no null; see the lossy list
+}
+
+function tomlInline(value) {
+  if (isPlainObject(value)) {
+    return '{ ' + Object.keys(value)
+      .map((k) => tomlKeyText(k) + ' = ' + tomlInline(value[k])).join(', ') + ' }';
+  }
+  if (Array.isArray(value)) return '[' + value.map(tomlInline).join(', ') + ']';
+  return tomlScalar(value);
+}
+
+function emitTOML(value, options) {
+  if (!isPlainObject(value)) {
+    throw new Error('TOML output needs an object at the top level — this document is a ' +
+                    typeOf(value) + '. Wrap it, or pick another output format.');
+  }
+  const lines = [];
+
+  const isTableArray = (v) => Array.isArray(v) && v.length > 0 && v.every(isPlainObject);
+
+  const write = (node, path) => {
+    // Scalars and non-table arrays first, so they land under the right header.
+    for (const key of Object.keys(node)) {
+      const child = node[key];
+      if (isPlainObject(child) || isTableArray(child)) continue;
+      lines.push(tomlKeyText(key) + ' = ' + tomlScalar(child));
+    }
+    for (const key of Object.keys(node)) {
+      const child = node[key];
+      const childPath = path.concat([key]);
+      const header = childPath.map(tomlKeyText).join('.');
+      if (isPlainObject(child)) {
+        lines.push('');
+        lines.push('[' + header + ']');
+        write(child, childPath);
+      } else if (isTableArray(child)) {
+        for (const item of child) {
+          lines.push('');
+          lines.push('[[' + header + ']]');
+          write(item, childPath);
+        }
+      }
+    }
+  };
+
+  write(value, []);
+  return lines.join('\n').replace(/^\n+/, '') + '\n';
+}
+
+/* --- TOML parsing -------------------------------------------------------- */
+
+function tomlUnescape(str) {
+  return str.replace(/\\(u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|.)/g, (match, code) => {
+    if (code[0] === 'u' || code[0] === 'U') {
+      return String.fromCodePoint(parseInt(code.slice(1), 16));
+    }
+    switch (code) {
+      case 'n': return '\n';
+      case 't': return '\t';
+      case 'r': return '\r';
+      case 'b': return '\b';
+      case 'f': return '\f';
+      case '"': return '"';
+      case '\\': return '\\';
+      default: return '\\' + code;
+    }
+  });
+}
+
+/* A hand-rolled cursor, because TOML values nest (inline tables inside arrays
+   inside inline tables) and a line-at-a-time split cannot see that. */
+function tomlReader(text) {
+  let i = 0;
+  const src = text;
+
+  const error = (message) => {
+    const line = src.slice(0, i).split('\n').length;
+    throw new Error('Line ' + line + ': ' + message);
+  };
+  const skipSpace = (newlines) => {
+    for (;;) {
+      while (i < src.length && (src[i] === ' ' || src[i] === '\t' ||
+             (newlines && (src[i] === '\n' || src[i] === '\r')))) i++;
+      if (src[i] === '#') { while (i < src.length && src[i] !== '\n') i++; continue; }
+      return;
+    }
+  };
+
+  const readBasicString = () => {
+    if (src.startsWith('"""', i)) {
+      i += 3;
+      if (src[i] === '\n') i++;
+      const end = src.indexOf('"""', i);
+      if (end === -1) error('unterminated multi-line string');
+      let body = src.slice(i, end);
+      i = end + 3;
+      // A backslash at end of line swallows the newline and following blanks.
+      body = body.replace(/\\\s*\n\s*/g, '');
+      return tomlUnescape(body);
+    }
+    i++;
+    let out = '';
+    while (i < src.length && src[i] !== '"') {
+      if (src[i] === '\\') { out += src[i++]; out += src[i++]; continue; }
+      if (src[i] === '\n') error('unterminated string');
+      out += src[i++];
+    }
+    if (src[i] !== '"') error('unterminated string');
+    i++;
+    return tomlUnescape(out);
+  };
+
+  const readLiteralString = () => {
+    if (src.startsWith("'''", i)) {
+      i += 3;
+      if (src[i] === '\n') i++;
+      const end = src.indexOf("'''", i);
+      if (end === -1) error('unterminated multi-line literal string');
+      const body = src.slice(i, end);
+      i = end + 3;
+      return body;
+    }
+    i++;
+    const end = src.indexOf("'", i);
+    if (end === -1) error('unterminated literal string');
+    const body = src.slice(i, end);
+    i = end + 1;
+    return body;
+  };
+
+  const readKey = () => {
+    skipSpace(false);
+    if (src[i] === '"') return readBasicString();
+    if (src[i] === "'") return readLiteralString();
+    let out = '';
+    while (i < src.length && /[A-Za-z0-9_-]/.test(src[i])) out += src[i++];
+    if (out === '') error('expected a key');
+    return out;
+  };
+
+  const readKeyPath = () => {
+    const path = [readKey()];
+    for (;;) {
+      skipSpace(false);
+      if (src[i] !== '.') return path;
+      i++;
+      path.push(readKey());
+    }
+  };
+
+  const readValue = () => {
+    skipSpace(false);
+    const ch = src[i];
+    if (ch === '"') return readBasicString();
+    if (ch === "'") return readLiteralString();
+    if (ch === '[') {
+      i++;
+      const out = [];
+      for (;;) {
+        skipSpace(true);
+        if (src[i] === ']') { i++; return out; }
+        out.push(readValue());
+        skipSpace(true);
+        if (src[i] === ',') { i++; continue; }
+        skipSpace(true);
+        if (src[i] === ']') { i++; return out; }
+        error('expected , or ] in array');
+      }
+    }
+    if (ch === '{') {
+      i++;
+      const out = {};
+      for (;;) {
+        skipSpace(false);
+        if (src[i] === '}') { i++; return out; }
+        const path = readKeyPath();
+        skipSpace(false);
+        if (src[i] !== '=') error('expected = in inline table');
+        i++;
+        const value = readValue();
+        let node = out;
+        for (let p = 0; p < path.length - 1; p++) {
+          if (!isPlainObject(node[path[p]])) node[path[p]] = {};
+          node = node[path[p]];
+        }
+        node[path[path.length - 1]] = value;
+        skipSpace(false);
+        if (src[i] === ',') { i++; continue; }
+        if (src[i] === '}') { i++; return out; }
+        error('expected , or } in inline table');
+      }
+    }
+    // Bare token: boolean, date, or number.
+    let token = '';
+    while (i < src.length && !/[\s,\]}#]/.test(src[i])) token += src[i++];
+    if (token === 'true') return true;
+    if (token === 'false') return false;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(token)) return token;
+    if (/^\d{2}:\d{2}:\d{2}/.test(token)) return token;
+    if (/^\d{4}-\d{2}-\d{2}[Tt ]/.test(token)) {
+      // A space-separated datetime has its time half in the next token.
+      if (/[Tt]/.test(token) === false && /^\d{4}-\d{2}-\d{2} $/.test(token) === false) {
+        skipSpace(false);
+      }
+      return token;
+    }
+    if (token === 'inf' || token === '+inf') return Infinity;
+    if (token === '-inf') return -Infinity;
+    if (token === 'nan' || token === '+nan' || token === '-nan') return NaN;
+    const clean = token.replace(/_/g, '');
+    if (/^[-+]?0x[0-9a-fA-F]+$/.test(clean)) return parseInt(clean.replace('0x', ''), 16);
+    if (/^[-+]?0o[0-7]+$/.test(clean)) return parseInt(clean.replace('0o', ''), 8);
+    if (/^[-+]?0b[01]+$/.test(clean)) return parseInt(clean.replace('0b', ''), 2);
+    if (/^[-+]?\d+$/.test(clean)) return Number(clean);
+    if (/^[-+]?(\d+\.\d+([eE][-+]?\d+)?|\d+[eE][-+]?\d+)$/.test(clean)) return Number(clean);
+    if (token === '') error('expected a value');
+    error('cannot read the value "' + token + '"');
+  };
+
+  return { skipSpace, readKeyPath, readValue, error, at: () => i, src, done: () => i >= src.length,
+           peek: () => src[i], advance: () => i++, startsWith: (s) => src.startsWith(s, i) };
+}
+
+function parseTOML(text) {
+  const reader = tomlReader(text.replace(/\r\n?/g, '\n'));
+  const root = {};
+  let current = root;
+  const arrayTables = new Set();
+
+  const descend = (path, container, forArray) => {
+    let node = container;
+    for (let p = 0; p < path.length; p++) {
+      const key = path[p];
+      const last = p === path.length - 1;
+      if (Array.isArray(node[key])) {
+        node = node[key][node[key].length - 1];        // walk into the newest [[table]]
+        if (last && !forArray) continue;
+        continue;
+      }
+      if (!isPlainObject(node[key])) node[key] = {};
+      if (last && forArray) {
+        if (!Array.isArray(node[key])) node[key] = [];
+        node[key].push({});
+        return node[key][node[key].length - 1];
+      }
+      node = node[key];
+    }
+    return node;
+  };
+
+  for (;;) {
+    reader.skipSpace(true);
+    if (reader.done()) break;
+    if (reader.startsWith('[[')) {
+      for (let n = 0; n < 2; n++) reader.advance();
+      const path = reader.readKeyPath();
+      reader.skipSpace(false);
+      if (!reader.startsWith(']]')) reader.error('expected ]] to close a table array header');
+      for (let n = 0; n < 2; n++) reader.advance();
+      // Ensure every parent exists, then push a fresh element.
+      let node = root;
+      for (let p = 0; p < path.length - 1; p++) {
+        const key = path[p];
+        if (Array.isArray(node[key])) node = node[key][node[key].length - 1];
+        else {
+          if (!isPlainObject(node[key])) node[key] = {};
+          node = node[key];
+        }
+      }
+      const leaf = path[path.length - 1];
+      if (!Array.isArray(node[leaf])) node[leaf] = [];
+      node[leaf].push({});
+      current = node[leaf][node[leaf].length - 1];
+      arrayTables.add(path.join('.'));
+      continue;
+    }
+    if (reader.peek() === '[') {
+      reader.advance();
+      const path = reader.readKeyPath();
+      reader.skipSpace(false);
+      if (reader.peek() !== ']') reader.error('expected ] to close a table header');
+      reader.advance();
+      current = descend(path, root, false);
+      continue;
+    }
+    const path = reader.readKeyPath();
+    reader.skipSpace(false);
+    if (reader.peek() !== '=') reader.error('expected = after a key');
+    reader.advance();
+    const value = reader.readValue();
+    let node = current;
+    for (let p = 0; p < path.length - 1; p++) {
+      if (!isPlainObject(node[path[p]])) node[path[p]] = {};
+      node = node[path[p]];
+    }
+    node[path[path.length - 1]] = value;
+  }
+  return root;
+}
+
+/* ================================== CSV ================================== */
+
+function csvQuote(text) {
+  const str = String(text);
+  return /[",\n\r]/.test(str) ? '"' + str.replace(/"/g, '""') + '"' : str;
+}
+
+function csvCell(value) {
+  const kind = typeOf(value);
+  if (kind === 'null') return '';
+  if (kind === 'object' || kind === 'array') return JSON.stringify(value);
+  return String(value);
+}
+
+function emitCSV(value) {
+  if (!Array.isArray(value)) {
+    throw new Error('CSV output needs an array of rows at the top level — this document is a ' +
+                    typeOf(value) + '.');
+  }
+  if (!value.length) return '';
+  if (value.every(Array.isArray)) {
+    return value.map((row) => row.map((c) => csvQuote(csvCell(c))).join(',')).join('\n') + '\n';
+  }
+  if (!value.every(isPlainObject)) {
+    // A flat list still makes a usable one-column sheet.
+    return 'value\n' + value.map((v) => csvQuote(csvCell(v))).join('\n') + '\n';
+  }
+  const headers = [];
+  for (const row of value) {
+    for (const key of Object.keys(row)) if (headers.indexOf(key) === -1) headers.push(key);
+  }
+  const lines = [headers.map(csvQuote).join(',')];
+  for (const row of value) {
+    const cells = headers.map((h) => csvQuote(csvCell(h in row ? row[h] : null)));
+    // A single empty cell would make the whole line blank, and a blank line is
+    // not a row to any CSV reader. Quoting it keeps the row countable.
+    lines.push(cells.length === 1 && cells[0] === '' ? '""' : cells.join(','));
+  }
+  return lines.join('\n') + '\n';
+}
+
+/* RFC 4180: a quoted field may contain commas, newlines, and "" for a quote. */
+function parseCSVRows(text) {
+  const rows = [];
+  let row = [];
+  let field = '';
+  let quoted = false;
+  let sawQuote = false;
+  let i = 0;
+  const src = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  while (i < src.length) {
+    const ch = src[i];
+    if (quoted) {
+      if (ch === '"') {
+        if (src[i + 1] === '"') { field += '"'; i += 2; continue; }
+        quoted = false; i++; continue;
+      }
+      field += ch; i++; continue;
+    }
+    if (ch === '"' && field === '') { quoted = true; sawQuote = true; i++; continue; }
+    if (ch === ',') { row.push(field); field = ''; i++; continue; }
+    if (ch === '\n') {
+      row.push(field); rows.push(row); row = []; field = ''; sawQuote = false; i++; continue;
+    }
+    field += ch; i++;
+  }
+  if (field !== '' || row.length || sawQuote) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+function csvAutoType(text) {
+  if (text === '') return null;
+  if (/^-?\d+$/.test(text) && String(Number(text)) === text) return Number(text);
+  if (/^-?\d*\.\d+([eE][-+]?\d+)?$/.test(text)) return Number(text);
+  if (text === 'true') return true;
+  if (text === 'false') return false;
+  return text;
+}
+
+function parseCSV(text) {
+  const rows = parseCSVRows(text.replace(/\n+$/, ''));
+  if (!rows.length) return [];
+  const headers = rows[0];
+  return rows.slice(1).map((row) => {
+    const out = {};
+    headers.forEach((header, i) => { out[header] = csvAutoType(row[i] === undefined ? '' : row[i]); });
+    return out;
+  });
+}
+
+/* ================================== XML ================================== */
+
+function xmlEscape(text, inAttribute) {
+  let out = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (inAttribute) out = out.replace(/"/g, '&quot;');
+  return out;
+}
+
+function isXMLName(name) {
+  return /^[A-Za-z_][A-Za-z0-9._-]*$/.test(name);
+}
+
+/* Keys that are not legal element names become <item key="..."> so the
+   original key survives the round trip instead of being mangled. */
+function emitXML(value, options) {
+  const pad = ' '.repeat(options.indent);
+  const lines = ['<?xml version="1.0" encoding="UTF-8"?>'];
+
+  const writeNode = (name, node, depth, keyAttr) => {
+    const prefix = pad.repeat(depth);
+    const attrs = keyAttr === undefined ? '' : ' key="' + xmlEscape(keyAttr, true) + '"';
+    if (Array.isArray(node)) {
+      lines.push(prefix + '<' + name + attrs + ' type="array">');
+      for (const item of node) writeNode('item', item, depth + 1);
+      lines.push(prefix + '</' + name + '>');
+      return;
+    }
+    if (isPlainObject(node)) {
+      if (!Object.keys(node).length) {
+        lines.push(prefix + '<' + name + attrs + ' type="object"/>');
+        return;
+      }
+      lines.push(prefix + '<' + name + attrs + '>');
+      for (const key of Object.keys(node)) {
+        if (isXMLName(key)) writeNode(key, node[key], depth + 1);
+        else writeNode('item', node[key], depth + 1, key);
+      }
+      lines.push(prefix + '</' + name + '>');
+      return;
+    }
+    if (node === null) {
+      lines.push(prefix + '<' + name + attrs + ' nil="true"/>');
+      return;
+    }
+    const kind = typeOf(node);
+    const typeAttr = kind === 'string' ? '' : ' type="' + kind + '"';
+    lines.push(prefix + '<' + name + attrs + typeAttr + '>' +
+               xmlEscape(String(node)) + '</' + name + '>');
+  };
+
+  writeNode('root', value, 0);
+  return lines.join('\n') + '\n';
+}
+
+/* A small well-formed-XML reader: elements, attributes, text, CDATA. */
+function parseXMLTree(text) {
+  let i = 0;
+  const src = text;
+  const error = (message) => {
+    throw new Error('Line ' + src.slice(0, i).split('\n').length + ': ' + message);
+  };
+  const unescape = (str) => str
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#x([0-9a-fA-F]+);/g, (m, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (m, d) => String.fromCodePoint(Number(d)))
+    .replace(/&amp;/g, '&');               // last, or "&amp;lt;" would double-decode
+
+  const skipMisc = () => {
+    for (;;) {
+      while (i < src.length && /\s/.test(src[i])) i++;
+      if (src.startsWith('<?', i)) { i = src.indexOf('?>', i) + 2; continue; }
+      if (src.startsWith('<!--', i)) { i = src.indexOf('-->', i) + 3; continue; }
+      if (src.startsWith('<!', i)) { i = src.indexOf('>', i) + 1; continue; }
+      return;
+    }
+  };
+
+  const parseElement = () => {
+    if (src[i] !== '<') error('expected an element');
+    i++;
+    let name = '';
+    while (i < src.length && !/[\s/>]/.test(src[i])) name += src[i++];
+    const attributes = {};
+    for (;;) {
+      while (i < src.length && /\s/.test(src[i])) i++;
+      if (src[i] === '/' || src[i] === '>') break;
+      let attrName = '';
+      while (i < src.length && !/[\s=]/.test(src[i])) attrName += src[i++];
+      while (i < src.length && /[\s=]/.test(src[i])) i++;
+      const quote = src[i];
+      if (quote !== '"' && quote !== "'") error('attribute value must be quoted');
+      i++;
+      let attrValue = '';
+      while (i < src.length && src[i] !== quote) attrValue += src[i++];
+      i++;
+      attributes[attrName] = unescape(attrValue);
+    }
+    if (src[i] === '/') { i += 2; return { name, attributes, children: [], text: '' }; }
+    i++;                                    // past '>'
+    const children = [];
+    let text = '';
+    for (;;) {
+      if (i >= src.length) error('unclosed <' + name + '>');
+      if (src.startsWith('</', i)) {
+        i = src.indexOf('>', i) + 1;
+        return { name, attributes, children, text };
+      }
+      if (src.startsWith('<![CDATA[', i)) {
+        const end = src.indexOf(']]>', i);
+        text += src.slice(i + 9, end);
+        i = end + 3;
+        continue;
+      }
+      if (src.startsWith('<!--', i)) { i = src.indexOf('-->', i) + 3; continue; }
+      if (src[i] === '<') { children.push(parseElement()); continue; }
+      let chunk = '';
+      while (i < src.length && src[i] !== '<') chunk += src[i++];
+      // CDATA above is taken literally; ordinary text carries entities.
+      text += unescape(chunk);
+    }
+  };
+
+  skipMisc();
+  const root = parseElement();
+  return root;
+}
+
+function xmlNodeToValue(node) {
+  if (node.attributes.nil === 'true') return null;
+  const type = node.attributes.type;
+  if (type === 'array' || (node.children.length && node.children.every((c) => c.name === 'item') &&
+      node.children.every((c) => c.attributes.key === undefined) && type !== undefined)) {
+    return node.children.map(xmlNodeToValue);
+  }
+  if (node.children.length) {
+    if (type === 'array') return node.children.map(xmlNodeToValue);
+    const out = {};
+    // Repeated element names become an array, which is how XML expresses a list
+    // when it has not been told otherwise.
+    for (const child of node.children) {
+      const key = child.attributes.key !== undefined ? child.attributes.key : child.name;
+      const value = xmlNodeToValue(child);
+      if (key in out) {
+        if (!Array.isArray(out[key])) out[key] = [out[key]];
+        out[key].push(value);
+      } else {
+        out[key] = value;
+      }
+    }
+    return out;
+  }
+  const text = node.text;
+  if (type === 'number') return Number(text.trim());
+  if (type === 'boolean') return text.trim() === 'true';
+  if (type === 'object') return {};
+  if (type === 'array') return [];
+  return text;
+}
+
+function parseXML(text) {
+  const root = parseXMLTree(text);
+  if (root.attributes.type === 'array') return root.children.map(xmlNodeToValue);
+  return xmlNodeToValue(root);
+}
+
+/* ============================== detection =============================== */
+
+function detectFormat(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+  if (trimmed[0] === '<') return 'xml';
+  if ((trimmed[0] === '{' || trimmed[0] === '[')) {
+    try { JSON.parse(trimmed); return 'json'; } catch (err) { /* fall through */ }
+  }
+  // A TOML header or a bare "key = value" line is unambiguous; YAML has no "=".
+  const lines = trimmed.split('\n').map((l) => l.trim())
+    .filter((l) => l && !l.startsWith('#'));
+  const tomlish = lines.filter((l) => /^\[\[?[^\]]+\]\]?$/.test(l) || /^[^:]*\s=\s/.test(l)).length;
+  const yamlish = lines.filter((l) => /^-\s/.test(l) || /^[^=]+:(\s|$)/.test(l)).length;
+  if (tomlish > yamlish) return 'toml';
+  if (yamlish) return 'yaml';
+  // Every line having the same comma count is the CSV signature.
+  const counts = lines.map((l) => (l.match(/,/g) || []).length);
+  if (lines.length > 1 && counts[0] > 0 && counts.every((c) => c === counts[0])) return 'csv';
+  if (tomlish) return 'toml';
+  return 'yaml';
+}
+
+/* ========================= conversion + warnings ========================= */
+
+function walkValues(value, visit, path) {
+  visit(value, path || '$');
+  if (Array.isArray(value)) {
+    value.forEach((item, i) => walkValues(item, visit, (path || '$') + '[' + i + ']'));
+  } else if (isPlainObject(value)) {
+    for (const key of Object.keys(value)) walkValues(value[key], visit, (path || '$') + '.' + key);
+  }
+}
+
+/* What the target format genuinely cannot represent. Listed, never silent. */
+function lossyNotes(value, target) {
+  const notes = [];
+  const add = (note) => { if (notes.indexOf(note) === -1) notes.push(note); };
+
+  let hasNull = false, hasNested = false, maxDepth = 0, hasEmptyKey = false;
+  let hasNonXMLKey = false, hasMixedArray = false, hasBigInt = false;
+  walkValues(value, (node, path) => {
+    const depth = (path.match(/[.[]/g) || []).length;
+    if (depth > maxDepth) maxDepth = depth;
+    if (node === null) hasNull = true;
+    if (isPlainObject(node)) {
+      for (const key of Object.keys(node)) {
+        if (key === '') hasEmptyKey = true;
+        if (!isXMLName(key)) hasNonXMLKey = true;
+        if (isPlainObject(node[key]) || Array.isArray(node[key])) hasNested = true;
+      }
+    }
+    if (Array.isArray(node) && node.length &&
+        !node.every(isPlainObject) && node.some((v) => isPlainObject(v) || Array.isArray(v))) {
+      hasMixedArray = true;
+    }
+    if (typeof node === 'number' && Number.isInteger(node) &&
+        Math.abs(node) > Number.MAX_SAFE_INTEGER) hasBigInt = true;
+  });
+
+  if (target === 'toml') {
+    if (hasNull) add('TOML has no null. Null values are written as an empty string.');
+    if (hasMixedArray) {
+      add('An array here mixes tables with plain values; TOML writes it as an inline array, ' +
+          'which is legal but harder to read.');
+    }
+    if (hasBigInt) add('Integers beyond 2^53 are written as floats and lose precision.');
+  }
+  if (target === 'csv') {
+    if (!Array.isArray(value)) {
+      add('CSV is a table, so only an array of rows converts cleanly. ' +
+          'This document is a ' + typeOf(value) + '.');
+    } else if (hasNested) {
+      add('Nested objects and arrays are written into their cell as JSON — a CSV cell ' +
+          'cannot hold structure.');
+    }
+    if (hasNull) add('Null and empty string are both written as an empty cell, and read ' +
+                     'back as null.');
+    add('Types are not carried in a CSV file. Reading this back, "12" becomes a number and ' +
+        '"true" becomes a boolean.');
+  }
+  if (target === 'xml') {
+    if (hasNonXMLKey) {
+      add('Some keys are not legal XML element names; those become <item key="..."> so the ' +
+          'original key survives.');
+    }
+    if (hasEmptyKey) add('An empty key cannot be an element name and is carried in a key ' +
+                         'attribute.');
+    add('XML has no types of its own. Numbers, booleans and nulls are marked with a type ' +
+        'attribute so they can be read back.');
+  }
+  if (target === 'yaml') {
+    add('Comments in the source are not carried across — no format here stores them.');
+  }
+  if (target === 'json') {
+    if (hasBigInt) add('Integers beyond 2^53 cannot be held exactly by a JSON number.');
+    add('JSON has no comments and no date type; dates are written as strings.');
+  }
+  let hasNumericKey = false;
+  walkValues(value, (node) => {
+    if (isPlainObject(node)) {
+      for (const key of Object.keys(node)) if (/^(0|[1-9]\d*)$/.test(key)) hasNumericKey = true;
+    }
+  });
+  if (hasNumericKey) {
+    add('A key here is a plain number ("0", "12"). JavaScript objects always list ' +
+        'number-like keys first, in numeric order, so those keys move to the front ' +
+        'whatever order they arrived in.');
+  }
+  return notes;
+}
+
+const PARSERS = { json: parseJSON, yaml: parseYAML, toml: parseTOML, csv: parseCSV, xml: parseXML };
+
+function convert(text, from, to, options) {
+  const source = from === 'auto' ? detectFormat(text) : from;
+  if (!source) return { output: '', detected: null, notes: [] };
+  const parser = PARSERS[source];
+  if (!parser) throw new Error('Unknown input format: ' + source);
+
+  let value;
+  try {
+    value = parser(text);
+  } catch (err) {
+    throw new Error('Could not read the input as ' + source.toUpperCase() + ' — ' + err.message);
+  }
+  if (options.sort) value = sortDeep(value);
+
+  let output;
+  switch (to) {
+    case 'json': output = emitJSON(value, options); break;
+    case 'yaml': output = emitYAML(value, options); break;
+    case 'toml': output = emitTOML(value, options); break;
+    case 'csv': output = emitCSV(value); break;
+    case 'xml': output = emitXML(value, options); break;
+    default: throw new Error('Unknown output format: ' + to);
+  }
+  return { output, detected: source, notes: source === to ? [] : lossyNotes(value, to), value };
+}
+
+/* ==== UI ==== */
+
+const $ = (id) => document.getElementById(id);
+
+function show(el, text) { el.textContent = text; el.style.display = text ? 'block' : 'none'; }
+
+function currentOptions() {
+  return { indent: $('opt-indent4').checked ? 4 : 2, sort: $('opt-sort').checked };
+}
+
+function run() {
+  const text = $('input-text').value;
+  const to = $('output-format').value;
+  const box = $('lossy-box');
+  if (!text.trim()) {
+    $('output-text').value = '';
+    show($('convert-error'), '');
+    show($('detect-note'), '');
+    box.style.display = 'none';
+    return;
+  }
+  try {
+    const result = convert(text, $('input-format').value, to, currentOptions());
+    $('output-text').value = result.output;
+    show($('convert-error'), '');
+    show($('detect-note'),
+         'Read as ' + String(result.detected).toUpperCase() + ', written as ' + to.toUpperCase() +
+         ' — ' + result.output.split('\n').length + ' lines.');
+    const list = $('lossy-list');
+    list.textContent = '';
+    for (const note of result.notes) {
+      const li = document.createElement('li');
+      li.textContent = note;
+      list.append(li);
+    }
+    box.style.display = result.notes.length ? 'block' : 'none';
+  } catch (err) {
+    $('output-text').value = '';
+    show($('convert-error'), err.message);
+    show($('detect-note'), '');
+    box.style.display = 'none';
+  }
+}
+
+const SAMPLE = `# Deployment settings for the workshop
+name: slippy-labs
+version: 2.4.1
+enabled: true
+retries: 3
+timeout: 1.5e+3
+tags:
+  - static
+  - no-backend
+  - "yes"
+server:
+  host: 0.0.0.0
+  port: 8080
+  tls:
+    enabled: true
+    cert: /etc/ssl/wildcard.pem
+routes:
+  - path: /
+    upstream: localhost:8001
+    cache: false
+  - path: /api
+    upstream: localhost:8002
+    cache: true
+motd: |
+  Two lines of text,
+  kept exactly as written.
+notes: null
+`;
+
+['input-text', 'input-format', 'output-format', 'opt-indent4', 'opt-sort'].forEach((id) => {
+  const el = $(id);
+  el.addEventListener(el.tagName === 'TEXTAREA' ? 'input' : 'change', run);
+});
+
+$('sample-btn').addEventListener('click', () => {
+  $('input-text').value = SAMPLE;
+  $('input-format').value = 'auto';
+  run();
+});
+$('clear-btn').addEventListener('click', () => {
+  $('input-text').value = '';
+  run();
+  $('input-text').focus();
+});
+$('swap-btn').addEventListener('click', () => {
+  const output = $('output-text').value;
+  if (!output) return;
+  $('input-format').value = $('output-format').value;
+  $('input-text').value = output;
+  run();
+});
+$('copy-btn').addEventListener('click', async () => {
+  const text = $('output-text').value;
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    $('copy-btn').textContent = 'Copied';
+  } catch (err) {
+    $('output-text').select();
+    document.execCommand('copy');
+    $('copy-btn').textContent = 'Copied';
+  }
+  setTimeout(() => { $('copy-btn').textContent = 'Copy Output'; }, 1200);
+});
+$('download-btn').addEventListener('click', () => {
+  const text = $('output-text').value;
+  if (!text) return;
+  const format = $('output-format').value;
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'converted.' + format;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+});
+
+$('input-text').value = SAMPLE;
+run();
+</script>
+</body>
+</html>
